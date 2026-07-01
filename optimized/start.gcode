@@ -4,7 +4,7 @@
 ;M1002 set_flag build_plate_detect_flag=1
 
 ;======== P2S start gcode==========
-;===== 2026/04/21 =====
+;===== 2026/05/18 =====
 ;;==== 2025-12-01 added comments ===
 ;;==== 2026-07-01 include bambu updates ===
 
@@ -108,7 +108,7 @@
 
 ;===== start to heat heatbed & hotend==========
   M1002 gcode_claim_action : 2 ;; status text = heatbed preheating
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
   M104 S140 A ;; set nozzle temp (A = left/first extruder)
 
   G29.2 S0 ; avoid invalid abl data ;; disable bed mesh
@@ -138,7 +138,7 @@
 
 ;===== detection start =====
   M1002 gcode_claim_action : 11 ;; status text - identify build plate type
-  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A ; rise temp in advance
+  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]-80} A ; rise temp in advance
   M972 S19 P0 T5000 ; plate type detection ;; <== takes 0 seconds?!
 
   ;; added by Bambu update (merged 2026-07-01)
@@ -147,7 +147,7 @@
   ;;{if max_print_z >= 145}
   ;;  M1002 gcode_claim_action : 75 ;  Detect obstacles at the botton of the heated bed
   ;;  G150.3
-  ;;  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ; rise temp in advance
+  ;;  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]} ; rise temp in advance
   ;;  G3811 Z{max_print_z}  ; Detect obstacles at the bottom of the heated bed
   ;;{endif}
 ;===== detection end =====
@@ -164,31 +164,31 @@
   G150.3 ;; move to garbage bin
   
   ;; something special for 0.2 nozzle
-  {if ((filament_type[initial_no_support_extruder] == "PLA") || (filament_type[initial_no_support_extruder] == "PLA-CF") || (filament_type[initial_no_support_extruder] == "PETG")) && (nozzle_diameter[initial_no_support_extruder] == 0.2)}
-    M620.10 A0 F74.8347 H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
-    M620.10 A1 F74.8347 H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
+  {if ((filament_type[initial_no_support_filament_id] == "PLA") || (filament_type[initial_no_support_filament_id] == "PLA-CF") || (filament_type[initial_no_support_filament_id] == "PETG")) && (nozzle_diameter_at_nozzle_id[initial_nozzle_id] == 0.2)}
+    M620.10 A0 F74.8347 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
+    M620.10 A1 F74.8347 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
   {else}
-    M620.10 A0 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
-    M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
+    M620.10 A0 F{flush_volumetric_speeds[initial_no_support_filament_id]/2.4053*60} H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
+    M620.10 A1 F{flush_volumetric_speeds[initial_no_support_filament_id]/2.4053*60} H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
   {endif}
   
-  M620.11 P0 L0 I[initial_no_support_extruder] E0 ;; ??? reset material/extruder state?
-  M620.11 K0 I[initial_no_support_extruder] R0 ;; ??? ams related?
+  M620.11 P0 L0 I[initial_no_support_filament_id] E0 ;; ??? reset material/extruder state?
+  M620.11 K0 I[initial_no_support_filament_id] R0 ;; ??? ams related?
 
-  M620 S[initial_no_support_extruder]A ; switch material if AMS exist ;; select ams tray by index
+  M620 S[initial_no_support_filament_id]A ; switch material if AMS exist ;; select ams tray by index
   M1002 gcode_claim_action : 4 ;; status text - changing filament
   M1002 set_filament_type:UNKNOWN
   M400 ;; finish moves
   
-  T[initial_no_support_extruder] ;; tool change ==> change filament code??
+  T[initial_no_support_filament_id] ;; tool change ==> change filament code??
   
   M400 ;; finish moves
   M628 S0 ;; ??? deactivate ams lock?
   M629 ;; ??? sync ams status?
   M400 ;; finish moves
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]} ;; set material type
-  M621 S[initial_no_support_extruder]A ;; ??? confirm ams slot?
-  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ;; set nozzle temp
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]} ;; set material type
+  M621 S[initial_no_support_filament_id]A ;; ??? confirm ams slot?
+  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]} ;; set nozzle temp
   M400 ;; finish moves
   M106 P1 S0 ;; fan off
   M400 ;; finish moves
@@ -203,17 +203,17 @@
   
   ;; calibration off
   M622 J0 ;; start conditional block if value=0
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
   M623 ;; end conditional block
 
   ;; calibration on?
   M622 J1 ;; start conditional block if value=1
-    M1002 set_filament_type:{filament_type[initial_no_support_extruder]} ;; set material type
+    M1002 set_filament_type:{filament_type[initial_no_support_filament_id]} ;; set material type
     M1002 gcode_claim_action : 8 ;; status text - calibrating extrusion
-    M109 S{nozzle_temperature[initial_no_support_extruder]} ;; wait for nozzle temp
+    M109 S{nozzle_temperature[initial_no_support_filament_id]} ;; wait for nozzle temp
     G90 ;; absolute positioning
     M83 ;; relative extrusion mode
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
     M400 ;; finish moves
     
     ;; disabled
@@ -226,12 +226,12 @@
 
   ;; calibration auto?
   M622 J2 ;; start conditional block if value=2
-    M1002 set_filament_type:{filament_type[initial_no_support_extruder]} ;; set material type
+    M1002 set_filament_type:{filament_type[initial_no_support_filament_id]} ;; set material type
     M1002 gcode_claim_action : 8 ;; status text - calibrating extrusion
-    M109 S{nozzle_temperature[initial_no_support_extruder]} ;; wait for nozzle temp
+    M109 S{nozzle_temperature[initial_no_support_filament_id]} ;; wait for nozzle temp
     G90 ;; absolute positioning
     M83 ;; relative extrusion mode
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
     M400 ;; finish moves
     
     ;; disabled
@@ -246,7 +246,7 @@
 
   {if hold_chamber_temp_for_flat_print}
     M1002 gcode_claim_action : 58 ;; status text - ???
-    M104 S{first_layer_temperature[initial_no_support_extruder]} ;; nozzle temp
+    M104 S{first_layer_temperature[initial_no_support_filament_id]} ;; nozzle temp
     {if bed_temperature_initial_layer_single > 89}
         M1030 S1800 ;; ???
         SYNC R0 T1800 ;; ???
@@ -259,7 +259,7 @@
 
 
 ;; disabled & rewrite
-;;{if filament_type[current_extruder] == "TPU" || filament_type[current_extruder] == "PVA"}
+;;{if filament_type[initial_filament_id] == "TPU" || filament_type[initial_filament_id] == "PVA"}
 ;;{else}
 ;;  M83 ;; relative extrusion mode
 ;;  G1 E-3 F1800 ;; retract
@@ -278,7 +278,7 @@
 ;;G90 ;; absolute positioning
 ;;M400 ;; finish moves
 
-;;M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A ;; set nozzle temp (A = left/first extruder)
+;;M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]-80} A ;; set nozzle temp (A = left/first extruder)
 
 
   ;; addon
@@ -291,7 +291,7 @@
   
   ;;; cut original temp block
   
-  {if filament_type[current_extruder] == "TPU" || filament_type[current_extruder] == "PVA"}
+  {if filament_type[initial_filament_id] == "TPU" || filament_type[initial_filament_id] == "PVA"}
     ;; no retract
   {else}
     G1 E-2 F1800 ;; quick rectract
@@ -304,7 +304,7 @@
   M400 ;; finish moves
   
   ;; set temp and proceed
-  {if filament_type[current_extruder] == "PC"}
+  {if filament_type[initial_filament_id] == "PC"}
     M104 S170 A ;; set nozzle temp (+ nozzle A?)
   {else}
     M104 S140 A ;; set nozzle temp (+ nozzle A?)
@@ -313,7 +313,7 @@
 
 ;; === nozzle cleaning (scraping) ===
   M1002 gcode_claim_action : 14 ;; status text - cleaning nozzle
-  {if filament_type[current_extruder] == "PC"}
+  {if filament_type[initial_filament_id] == "PC"}
     G150 T170 ;; nozzle cleaning (scraping on metal pad)
   {else}
     G150 T140 ;; nozzle cleaning (scraping on metal pad)
@@ -322,7 +322,7 @@
 ;; === nozzle cleaning (scraping) ===
 
 
-  {if filament_type[current_extruder] == "PC"}
+  {if filament_type[initial_filament_id] == "PC"}
     M109 S170 A ;; wait for nozzle temp (+ bambu parameter "A")
   {else}
     M109 S140 A ;; wait for nozzle temp (+ bambu parameter "A")
@@ -402,7 +402,7 @@
   M985.1 U0 E2 ;; ???
   M985.1 U1 E2 ;; ???
 
-  M104 S[nozzle_temperature_initial_layer] A ;; set nozzle temp (A = left/first extruder)
+  M104 S{nozzle_temperature_initial_layer[initial_filament_id]} A ;; set nozzle temp (A = left/first extruder)
   G150.3 ; move to garbage can to wait for temp
 
   ;===== wait temperature reaching the reference value =======
@@ -426,15 +426,15 @@
   G91 ;; relative positioning
   G1 Z6 F1200 ;; lower z by 6
   G90 ;; absolute positioning
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]} ;; set material type
-  M620 S[initial_no_support_extruder]A ;; ??? disable ams filament pullback?
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]} ;; set material type
+  M620 S[initial_no_support_filament_id]A ;; ??? disable ams filament pullback?
   M400 ;; finish moves
-  T[initial_no_support_extruder] ;; tool change
+  T[initial_no_support_filament_id] ;; tool change
   M400 ;; finish moves
   M628 S0 ;; ??? ams?
   M629 ;; ??? ams?
   M400 ;; finish moves
-  M621 S[initial_no_support_extruder]A ;; ??? enable ams filament pullback?
+  M621 S[initial_no_support_filament_id]A ;; ??? enable ams filament pullback?
 ;============switch again==================
 
 
@@ -473,12 +473,12 @@ G1 X100 Y0 F30000 ;; move front center
   M500 D1 ;; eeprom save (differential)
   M400 S3 ;; wait 3s (not sure if this is really necessary)
 
-  M109 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ;; wait for nozzle temp
-  ;G130 O0 X100 Y-0.2 Z0.6 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E12 D4 ;; original v1
-  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E20 D5 ;; original v2 - ??? special move command? (length, extrusion, dot size)
-  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L60 E30 D6 ;; custom: longer prime line - special move command (length, extrusion, dot size)
+  M109 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]} ;; wait for nozzle temp
+  ;G130 O0 X100 Y-0.2 Z0.6 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L40 E12 D4 ;; original v1
+  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L40 E20 D5 ;; original v2 - ??? special move command? (length, extrusion, dot size)
+  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L60 E30 D6 ;; custom: longer prime line - special move command (length, extrusion, dot size)
   ;; testing longer instead of thicker purge line
-  G130 O0 X100 Y-0.4 Z0.6 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L80 E24 D5 ;; custom: longer prime line - special move command (length, extrusion, dot size)
+  G130 O0 X100 Y-0.4 Z0.6 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L80 E24 D5 ;; custom: longer prime line - special move command (length, extrusion, dot size)
   G90 ;; absolute positioning
   M83 ;; relative extrusion mode
   ;; testing no z-adjustment for quicker nozzle movement
@@ -492,9 +492,9 @@ G1 X100 Y0 F30000 ;; move front center
 
 
 ;; --- dynamic clog detection ------------------------
-  {if (filament_type[initial_no_support_extruder] == "TPU")  ||
-  (filament_type[initial_no_support_extruder] == "PLA")  ||  (filament_type[initial_no_support_extruder] == "PETG")}
-    M1015.3 S1 H[nozzle_diameter] ; enable tpu, pla and petg clog detect
+  {if (filament_type[initial_no_support_filament_id] == "TPU")  ||
+  (filament_type[initial_no_support_filament_id] == "PLA")  ||  (filament_type[initial_no_support_filament_id] == "PETG")}
+    M1015.3 S1 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} ; enable tpu, pla and petg clog detect
   {else}
     M1015.3 S0 ; disable clog detect
   {endif}
@@ -502,14 +502,14 @@ G1 X100 Y0 F30000 ;; move front center
 
 
 ;; --- dynamic air print detection -------------------
-  {if (filament_type[initial_no_support_extruder] == "PLA")  ||  (filament_type[initial_no_support_extruder] == "PETG")
-  ||  (filament_type[initial_no_support_extruder] == "PLA-CF")  ||  (filament_type[initial_no_support_extruder] == "PETG-CF")}
-    M1015.4 S1 K1 H[nozzle_diameter] ; enable E air printing detect
+  {if (filament_type[initial_no_support_filament_id] == "PLA")  ||  (filament_type[initial_no_support_filament_id] == "PETG")
+  ||  (filament_type[initial_no_support_filament_id] == "PLA-CF")  ||  (filament_type[initial_no_support_filament_id] == "PETG-CF")}
+    M1015.4 S1 K1 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} ; enable E air printing detect
   {else}
-    M1015.4 S0 K0 H[nozzle_diameter] ; disable E air printing detect
+    M1015.4 S0 K0 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} ; disable E air printing detect
   {endif}
   
-  M620.6 I[initial_no_support_extruder] W1 ; enable ams air printing detect
+  M620.6 I[initial_no_support_filament_id] W1 ; enable ams air printing detect
 ;; --- dynamic air print detection end ---------------
 
 

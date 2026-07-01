@@ -1,7 +1,8 @@
 ;======== P2S end gcode ==========
-;===== 2026/04/01 =====
+;===== 2026/05/18 =====
 ;; M400 ; wait for buffer to clear
 ;; G92 E0 ; zero the extruder
+M211 Z1
 ;;G1 E-0.8 F1800 ; retract
 ;;G0 Z{max_layer_z + 0.8} F900
 

@@ -4,8 +4,8 @@
 ;M1002 set_flag build_plate_detect_flag=1
 
 ;======== P2S start gcode==========
-;===== 2026/04/21 =====
-  
+;===== 2026/05/18 =====
+
   M140 S[bed_temperature_initial_layer_single] ; heat heatbed first
   M993 A0 B0 C0 ; nozzle cam detection not allowed.
   M400
@@ -14,12 +14,12 @@
 M17
 M400 S1
 M1006 S1
-M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50 
-M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50 
-M1006 A61 B9 L50 C61 D9 M50 E61 F9 N50 
-M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50 
-M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50 
-M1006 A61 B18 L50 C61 D18 M50 E61 F18 N50 
+M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50
+M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50
+M1006 A61 B9 L50 C61 D9 M50 E61 F9 N50
+M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50
+M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50
+M1006 A61 B18 L50 C61 D18 M50 E61 F18 N50
 M1006 W
 ;=====printer start sound ===================
 
@@ -50,7 +50,7 @@ M1006 W
   M983.4 S0
 ;===== reset machine status =================
 
-;==== set airduct mode ==== 
+;==== set airduct mode ====
 ;==== if Chamber Cooling is necessary ====
 {if (overall_chamber_temperature >= 40)}
 M145 P1 ; set airduct mode to heating mode for heating
@@ -80,12 +80,12 @@ M106 P2 S127 ; turn on 50% filter fan
 M142 P6 R30 S40 U0.3 V0.8 ; set PLA/TPU exhaust chamber autocooling
 {endif}
 {endif}
-;==== set airduct mode ==== 
+;==== set airduct mode ====
 
 ;===== start to heat heatbed & hotend==========
   M1002 gcode_claim_action : 2
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
-  M104 S140 A        
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
+  M104 S140 A
 
   G29.2 S0 ; avoid invalid abl data
 
@@ -106,13 +106,13 @@ M142 P6 R30 S40 U0.3 V0.8 ; set PLA/TPU exhaust chamber autocooling
 
 ;===== detection start =====
   M1002 gcode_claim_action : 11
-  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A ; rise temp in advance
+  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]-80} A ; rise temp in advance
   M972 S19 P0 T5000 ;plate type detection
-  
+
   {if max_print_z >= 145}
     M1002 gcode_claim_action : 75 ;  Detect obstacles at the botton of the heated bed
     G150.3
-    M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ; rise temp in advance
+    M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]} ; rise temp in advance
     G3811 Z{max_print_z}  ; Detect obstacles at the bottom of the heated bed
   {endif}
 ;===== detection end =====
@@ -121,32 +121,32 @@ M142 P6 R30 S40 U0.3 V0.8 ; set PLA/TPU exhaust chamber autocooling
   M400
   M211 X0 Y0 Z0 ;turn off soft endstop
   M975 S1 ; turn on input shaping
-  
+
   G29.2 S0 ; avoid invalid abl data
   G150.3
-{if ((filament_type[initial_no_support_extruder] == "PLA") || (filament_type[initial_no_support_extruder] == "PLA-CF") || (filament_type[initial_no_support_extruder] == "PETG")) && (nozzle_diameter[initial_no_support_extruder] == 0.2)}
-M620.10 A0 F74.8347 H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
-M620.10 A1 F74.8347 H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
+{if ((filament_type[initial_no_support_filament_id] == "PLA") || (filament_type[initial_no_support_filament_id] == "PLA-CF") || (filament_type[initial_no_support_filament_id] == "PETG")) && (nozzle_diameter_at_nozzle_id[initial_nozzle_id] == 0.2)}
+M620.10 A0 F74.8347 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
+M620.10 A1 F74.8347 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
 {else}
-M620.10 A0 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
-M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{nozzle_diameter[initial_no_support_extruder]} T{flush_temperatures[initial_no_support_extruder]} P{nozzle_temperature_initial_layer[initial_no_support_extruder]} S1
+M620.10 A0 F{flush_volumetric_speeds[initial_no_support_filament_id]/2.4053*60} H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
+M620.10 A1 F{flush_volumetric_speeds[initial_no_support_filament_id]/2.4053*60} H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} T{flush_temperatures[initial_no_support_filament_id]} P{nozzle_temperature_initial_layer[initial_no_support_filament_id]} S1
 {endif}
-  
- M620.11 P0 L0 I[initial_no_support_extruder] E0
- M620.11 K0 I[initial_no_support_extruder] R0
-  
-  M620 S[initial_no_support_extruder]A   ; switch material if AMS exist
+
+ M620.11 P0 L0 I[initial_no_support_filament_id] E0
+ M620.11 K0 I[initial_no_support_filament_id] R0
+
+  M620 S[initial_no_support_filament_id]A   ; switch material if AMS exist
   M1002 gcode_claim_action : 4
   M1002 set_filament_type:UNKNOWN
   M400
-  T[initial_no_support_extruder]
+  T[initial_no_support_filament_id]
   M400
   M628 S0
   M629
   M400
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
-  M621 S[initial_no_support_extruder]A
-  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]}
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
+  M621 S[initial_no_support_filament_id]A
+  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]}
   M400
   M106 P1 S0
   M400
@@ -158,16 +158,16 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
   M975 S1
   M1002 judge_flag extrude_cali_flag
   M622 J0
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
   M623
 
   M622 J1
-    M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
+    M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
     M1002 gcode_claim_action : 8
-    M109 S{nozzle_temperature[initial_no_support_extruder]}
+    M109 S{nozzle_temperature[initial_no_support_filament_id]}
     G90
     M83
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
     M400
     M106 P1 S255
     M400 S5
@@ -176,12 +176,12 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
   M623
 
   M622 J2
-    M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
+    M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
     M1002 gcode_claim_action : 8
-    M109 S{nozzle_temperature[initial_no_support_extruder]}
+    M109 S{nozzle_temperature[initial_no_support_filament_id]}
     G90
     M83
-    M983.3 F{filament_max_volumetric_speed[initial_no_support_extruder]/2.4} A0.4 ; cali dynamic extrusion compensation
+    M983.3 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2.4} A0.4 ; cali dynamic extrusion compensation
     M400
     M106 P1 S255
     M400 S5
@@ -192,9 +192,9 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
 
   {if hold_chamber_temp_for_flat_print}
     M1002 gcode_claim_action : 58
-    M104 S{first_layer_temperature[initial_no_support_extruder]}
+    M104 S{first_layer_temperature[initial_no_support_filament_id]}
     {if bed_temperature_initial_layer_single > 89}
-        M1030 S1800      
+        M1030 S1800
         SYNC R0 T1800
     {else}
         M1030 S300
@@ -202,8 +202,8 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
     {endif}
     M1030 C
   {endif}
-  
-  {if filament_type[current_extruder] == "TPU" || filament_type[current_extruder] == "PVA"}
+
+  {if filament_type[initial_filament_id] == "TPU" || filament_type[initial_filament_id] == "PVA"}
   {else}
     M83
     G1 E-3 F1800
@@ -219,14 +219,14 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
   G90
   M400
 
-  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A
+  M104 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]-80} A
 
 ;===== wipe right nozzle start =====
   M1002 gcode_claim_action : 14
-  G150 T{nozzle_temperature_initial_layer[initial_no_support_extruder]}
+  G150 T{nozzle_temperature_initial_layer[initial_no_support_filament_id]}
   M400
-  
-{if filament_type[current_extruder] == "PC"}
+
+{if filament_type[initial_filament_id] == "PC"}
   M109 S170 A
 {else}
   M109 S140 A
@@ -270,7 +270,7 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
     {endif}
     M400
   M623
-    
+
   M622 J2
     M1002 gcode_claim_action : 1
     {if hold_chamber_temp_for_flat_print}
@@ -291,17 +291,17 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
   M985.1 U0 E2
   M985.1 U1 E2
 
-  M104 S[nozzle_temperature_initial_layer] A
+  M104 S{nozzle_temperature_initial_layer[initial_filament_id]} A
   G150.3 ; move to garbage can to wait for temp
 
 ;===== wait temperature reaching the reference value =======
-  M190 S[bed_temperature_initial_layer_single] 
+  M190 S[bed_temperature_initial_layer_single]
 
   ;========turn off light and fans =============
   M960 S1 P0 ; turn off laser
   M960 S2 P0 ; turn off laser
   M106 S0 ; turn off cooling fan
-  
+
 ;===== wait temperature reaching the reference value =======
 
   M1002 gcode_claim_action : 255
@@ -313,15 +313,15 @@ M620.10 A1 F{flush_volumetric_speeds[initial_no_support_extruder]/2.4053*60} H{n
   G91
   G1 Z6 F1200
   G90
-  M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
-  M620 S[initial_no_support_extruder]A
+  M1002 set_filament_type:{filament_type[initial_no_support_filament_id]}
+  M620 S[initial_no_support_filament_id]A
   M400
-  T[initial_no_support_extruder]
+  T[initial_no_support_filament_id]
   M400
   M628 S0
   M629
   M400
-  M621 S[initial_no_support_extruder]A
+  M621 S[initial_no_support_filament_id]A
 ;============switch again==================
 
 ;===== for Textured PEI Plate , lower the nozzle as the nozzle was touching topmost of the texture when homing ==
@@ -348,11 +348,11 @@ M1002 gcode_claim_action : 51
   M400 P50
   M500 D1
   M400 S3
-  M109 S{nozzle_temperature_initial_layer[initial_no_support_extruder]}
+  M109 S{nozzle_temperature_initial_layer[initial_no_support_filament_id]}
   G0 X100 Y0 F24000
   M400
-  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E20 D5
-  G130 O0 X100 Y-0.2 Z0.6 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E12 D4
+  ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L40 E20 D5
+  G130 O0 X100 Y-0.2 Z0.6 F{filament_max_volumetric_speed[initial_no_support_filament_id]/2/2.4053} L40 E12 D4
   G90
   M83
   G1 Z1
@@ -361,21 +361,21 @@ M1002 gcode_claim_action : 51
 M1002 gcode_claim_action : 0
   G29.99
 
-{if (filament_type[initial_no_support_extruder] == "TPU") || 
-(filament_type[initial_no_support_extruder] == "PLA") ||  (filament_type[initial_no_support_extruder] == "PETG")}
-M1015.3 S1 H[nozzle_diameter];enable tpu, pla and petg clog detect
+{if (filament_type[initial_no_support_filament_id] == "TPU") ||
+(filament_type[initial_no_support_filament_id] == "PLA") ||  (filament_type[initial_no_support_filament_id] == "PETG")}
+M1015.3 S1 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]};enable tpu, pla and petg clog detect
 {else}
 M1015.3 S0;disable clog detect
 {endif}
 
-{if (filament_type[initial_no_support_extruder] == "PLA") ||  (filament_type[initial_no_support_extruder] == "PETG")
- ||  (filament_type[initial_no_support_extruder] == "PLA-CF")  ||  (filament_type[initial_no_support_extruder] == "PETG-CF")}
-M1015.4 S1 K1 H[nozzle_diameter] ;enable E air printing detect
+{if (filament_type[initial_no_support_filament_id] == "PLA") ||  (filament_type[initial_no_support_filament_id] == "PETG")
+ ||  (filament_type[initial_no_support_filament_id] == "PLA-CF")  ||  (filament_type[initial_no_support_filament_id] == "PETG-CF")}
+M1015.4 S1 K1 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} ;enable E air printing detect
 {else}
-M1015.4 S0 K0 H[nozzle_diameter] ;disable E air printing detect
+M1015.4 S0 K0 H{nozzle_diameter_at_nozzle_id[initial_nozzle_id]} ;disable E air printing detect
 {endif}
 
-M620.6 I[initial_no_support_extruder] W1 ;enable ams air printing detect
+M620.6 I[initial_no_support_filament_id] W1 ;enable ams air printing detect
 
 M1010 Q0 B0.023 S0.01
 M1010 Q1 B0.005 S0.01
