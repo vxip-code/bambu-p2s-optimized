@@ -1,5 +1,5 @@
 ;======== P2S end gcode ==========
-;===== 2025/11/03 =====
+;===== 2026/04/01 =====
 ;; M400 ; wait for buffer to clear
 ;; G92 E0 ; zero the extruder
 ;;G1 E-0.8 F1800 ; retract
@@ -128,6 +128,28 @@ M1002 set_gcode_claim_speed_level : 0 ; Reset speed mode
 M1015.3 S0 ; disable clog detect
 M1015.4 S0 K0 ; disable air printing detect
 ;; === reset values ===
+
+
+;=====printer finish air purification=========
+M622.1 S0
+M1002 judge_flag print_finish_air_filt_flag
+
+M622 J1
+M1002 gcode_claim_action : 66
+M145 P1
+M106 P2 S255
+M400 S180
+M106 P2 S0
+M623
+
+M622 J2
+M1002 gcode_claim_action : 66
+M145 P0
+M106 P3 S255
+M400 S180
+M106 P3 S0
+M623
+;=====printer finish air purification=========
 
 
 ;=====printer finish sound=========

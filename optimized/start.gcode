@@ -4,8 +4,9 @@
 ;M1002 set_flag build_plate_detect_flag=1
 
 ;======== P2S start gcode==========
-;===== 2025/11/04 =====
+;===== 2026/04/21 =====
 ;;==== 2025-12-01 added comments ===
+;;==== 2026-07-01 include bambu updates ===
 
 
   M140 S[bed_temperature_initial_layer_single] ; heat heatbed first
@@ -77,17 +78,29 @@
   {if (overall_chamber_temperature >= 40)}
     M145 P1 ; set airduct mode to heating mode for heating
     M106 P2 S255 ; turn on filter fan
+    M622.1 S0 ;; firmware feature macro
+    M1002 judge_flag ventobox_replace_aux1_fan_flag ;; set flag for conditional commands
+    M622 J0 ;; start conditional block if value=0
+      M106 P10 S0 ; turn off left aux fan
+    M623 ;; end conditional block
   {else}
     {if (min_vitrification_temperature <= 50)}
       M145 P0 ; set airduct mode to cooling mode for cooling
       M106 P2 S255 ; turn on auxiliary fan for cooling
+      M106 P3 S127 ; turn on chamber fan for cooling
       M1002 gcode_claim_action : 29 ;; status text = ???
       M191 S0 ; wait for chamber temp
       M106 P2 S102 ; turn on chamber cooling fan
-      M106 P10 S0 ; turn off left aux fan
+      M622.1 S0 ;; firmware feature macro
+      M1002 judge_flag ventobox_replace_aux1_fan_flag ;; set flag for conditional commands
+      M622 J0 ;; start conditional block if value=0
+        M106 P10 S0 ; turn off left aux fan
+      M623 ;; end conditional block
+      M142 P6 R30 S40 U0.3 V0.8 ; set PETG exhaust chamber autocooling
     {else}
       M145 P1 ; set airduct mode to heating mode for heating
       M106 P2 S127 ; turn on 50% filter fan
+      M142 P6 R30 S40 U0.3 V0.8 ; set PLA/TPU exhaust chamber autocooling
     {endif}
   {endif}
 ;==== set airduct mode ==== 
@@ -127,6 +140,16 @@
   M1002 gcode_claim_action : 11 ;; status text - identify build plate type
   M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A ; rise temp in advance
   M972 S19 P0 T5000 ; plate type detection ;; <== takes 0 seconds?!
+
+  ;; added by Bambu update (merged 2026-07-01)
+	;; if print is higher than X, test-move plate to max print height to see if there would be collisions
+	;; (we don't really need this right now - although it's a new security check that's now omitted)
+  ;;{if max_print_z >= 145}
+  ;;  M1002 gcode_claim_action : 75 ;  Detect obstacles at the botton of the heated bed
+  ;;  G150.3
+  ;;  M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ; rise temp in advance
+  ;;  G3811 Z{max_print_z}  ; Detect obstacles at the bottom of the heated bed
+  ;;{endif}
 ;===== detection end =====
 
 
@@ -226,8 +249,10 @@
     M104 S{first_layer_temperature[initial_no_support_extruder]} ;; nozzle temp
     {if bed_temperature_initial_layer_single > 89}
         M1030 S1800 ;; ???
+        SYNC R0 T1800 ;; ???
     {else}
         M1030 S300 ;; ???
+        SYNC R0 T300 ;; ???
     {endif}
     M1030 C ;; ???
   {endif}
@@ -354,7 +379,6 @@
       G29 A1 X{first_layer_print_min[0]} Y{first_layer_print_min[1]} I{first_layer_print_size[0]} J{first_layer_print_size[1]} ;; ??? print area mesh?
     {endif}
     M400 ;; finish moves
-    M500 ; save cali data
   M623
 
   M622 J2 ;; start conditional block if value=2 (auto?)
@@ -365,7 +389,6 @@
       G29 A2 X{first_layer_print_min[0]} Y{first_layer_print_min[1]} I{first_layer_print_size[0]} J{first_layer_print_size[1]} ;; ??? print area mesh?
     {endif}
     M400 ;; finish moves
-    M500 ; save cali data
   M623
 
   M622 J0 ;; start conditional block if value=0 (off)
@@ -417,10 +440,18 @@
 
 ;; --- build plate z offset --------------------------
   ;===== for Textured PEI Plate , lower the nozzle as the nozzle was touching topmost of the texture when homing ==
-  {if curr_bed_type=="Textured PEI Plate"}
-    G29.1 Z{0.01} ; for Textured PEI Plate
+  {if bed_temperature_initial_layer_single > 89}
+    {if curr_bed_type=="Textured PEI Plate"}
+      G29.1 Z{-0.02} ; for Textured PEI Plate
+    {else}
+      G29.1 Z{0.0}
+    {endif}
   {else}
-    G29.1 Z{0.03}
+    {if curr_bed_type=="Textured PEI Plate"}
+      G29.1 Z{0.01} ; for Textured PEI Plate
+    {else}
+      G29.1 Z{0.03}
+    {endif}
   {endif}
 ;; --- build plate z offset end ----------------------
 
@@ -436,6 +467,12 @@ G1 X100 Y0 F30000 ;; move front center
   G29.2 S1 ; ensure z comp turn on ;; enable bed mesh
   G90 ;; absolute positioning
   M83 ;; relative extrusion mode
+	
+	;; reworked save by Bambu 
+  M400 P50 ;; wait 50ms
+  M500 D1 ;; eeprom save (differential)
+  M400 S3 ;; wait 3s (not sure if this is really necessary)
+
   M109 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ;; wait for nozzle temp
   ;G130 O0 X100 Y-0.2 Z0.6 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E12 D4 ;; original v1
   ;G130 O0 X100 Y-0.4 Z0.8 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053} L40 E20 D5 ;; original v2 - ??? special move command? (length, extrusion, dot size)
