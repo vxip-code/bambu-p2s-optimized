@@ -2,24 +2,35 @@
 
 ## TL;DR
 
-The P2S is great but its print start & end routines have a couple of flaws. This updated G-code solves these issues and offers:
+The P2S is great but its print start & end routines have a couple of flaws.
+
+This updated G-code solves these issues and offers:
 
 - Improved nozzle cleaning
 - More quiet initialization
 - Remove redundancies
 - Improve speed and reliability
 
+## Showcase
+
+### Original / before
+
+![Original nozzle cleaning](assets/original-nozzle-clean.gif)
+
+### Optimized / after
+
+![Optimized nozzle cleaning](assets/optimized-nozzle-clean.gif)
+
 
 ## Disclaimer
 
-**⚠️ USE AT YOUR OWN RISK!**
+	⚠️ USE AT YOUR OWN RISK!
 
-This custom G-code is provided "as-is" without any warranties of safety or compatibility. This script has been tested to work with PLA and PETG - other materials such as engineering and high-temperature filaments have NOT been tested and therefore may be cause problems.
+	This custom G-code is provided "as-is" without any warranties of safety or compatibility. This script has been tested to work with PLA and PETG - other materials such as engineering and high-temperature filaments have NOT been tested and therefore may be cause problems.
 
-By executing this script, you accept full responsibility for any outcomes. The author assumes no liability for hardware damage (such as nozzle crashes or heater failures), financial losses, or personal injuries resulting from the use or modification of this code.
+	By executing this script, you accept full responsibility for any outcomes. The author assumes no liability for hardware damage (such as nozzle crashes or heater failures), financial losses, or personal injuries resulting from the use or modification of this code.
 
-Before running this script, you must manually verify that the commands match your specific printer model, firmware version, and hardware setup. Always remain by your machine's physical power switch during the initial execution to abort immediately if necessary.
-
+	Before running this script, you must manually verify that the commands match your specific printer model, firmware version, and hardware setup. Always remain by your machine's physical power switch during the initial execution to abort immediately if necessary.
 
 ## Why change anything?
 
@@ -29,7 +40,7 @@ This includes the printer being very noisy during its startup routine and unnece
 
 Worst of all - and the main reason for me to start optimizing the start code - being the excessive and subpar nozzle wiping that never seems to really get the nozzle clean.
 
-**Exhibit A:** This [YouTube Video](https://www.youtube.com/shorts/HUE2p0dOb1Q) demonstrates the issue quite well.
+**Exhibit A:** This [YouTube Video](https://www.youtube.com/shorts/HUE2p0dOb1Q) demonstrates the issue quite well (not my video btw).
 
 
 ## What was optimized?
