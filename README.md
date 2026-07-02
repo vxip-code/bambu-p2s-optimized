@@ -119,6 +119,44 @@ Secondly since the original start code is updated periodically, I want to easily
 - **Formatting:** Whitespaces have been cleaned up, indentation was improved, comments for sections have been added and new lines were added for better structur and orientation.
 
 
+## How to install
+
+> **Hint:** You can switch between the default and optimized printer profile any time you like.
+
+
+### Step 1
+
+- Start BambuStudio
+
+- Hover your mouse over where it shows your P2S in the top left corner
+
+- Click the appearing edit icon
+
+![Step 1 - Edit print profile](assets/install-01.png)
+
+
+### Step 2
+
+- New dialog pops up
+
+- Go to "Machine G-code" tab
+
+- Copy and paste contents of [start.gcode](optimized/start.gcode) into first field
+
+- Copy and paste contents of [stop.gcode](optimized/stop.gcode) into second field
+
+- Before closing the dialog click save icon in the top right
+
+- Enter something like "P2S 0.4 - optimized"
+
+- Close dialog
+
+![Step 2 - Add gcode and save](assets/install-02.png)
+
+
+**🎉 You now have a new printer, that does things a little better!**
+
+
 ## Repository layout
 
 The folder `optimized` contains all G-codes that have been improved and should be used for a better experience.
