@@ -157,6 +157,31 @@ Secondly since the original start code is updated periodically, I want to easily
 **🎉 You now have a new printer, that does things a little better!**
 
 
+## Performance benchmark
+
+### Prerequsites
+
+- White Elegoo Matte PLA (high flush volume)
+- Filament already loaded for all tests(*)
+- Model: 80 mm cube
+- Timer starts at first bed movement
+- Time stops at end of nozzle load line
+
+
+### Measurements
+
+| Profile   | Flow calibration   | Bed leveling  | Time  |
+|-----------|--------------------|---------------|-------|
+| original  | no                 | no            | 05:18 |
+| original  | yes                | yes           | 06:45 |
+| optimized | no                 | no            | 04:45 |
+| optimized | yes                | yes           | 06:02 |
+
+The optimized code is a bit faster and starts with a clean nozzle and no filament on the bed (which is the main benefit).
+
+(*) Keep in mind that the optimized code by default does not unload the filament after a print therefore consecutive prints with the same filament can start faster. Filament loading delay would be added to the measured times of the original profile.
+
+
 ## Repository layout
 
 The folder `optimized` contains all G-codes that have been improved and should be used for a better experience.
