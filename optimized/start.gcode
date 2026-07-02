@@ -18,18 +18,18 @@
   M400 ;; finish moves
 
 
-;; ;=====printer start sound ===================
-;;   M17 ;; enable steppers
-;;   M400 S1 ;; wait 1 second
-;;   M1006 S1
-;;   M1006 A53 B9 L99 C53 D9 M99 E53 F9 N99
-;;   M1006 A56 B9 L99 C56 D9 M99 E56 F9 N99
-;;   M1006 A61 B9 L99 C61 D9 M99 E61 F9 N99
-;;   M1006 A53 B9 L99 C53 D9 M99 E53 F9 N99
-;;   M1006 A56 B9 L99 C56 D9 M99 E56 F9 N99
-;;   M1006 A61 B18 L99 C61 D18 M99 E61 F18 N99
-;;   M1006 W
-;; ;=====printer start sound ===================
+;=====printer start sound ===================
+M17 ;; enable steppers
+M400 S1 ;; wait 1 second
+M1006 S1
+M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50
+M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50
+M1006 A61 B9 L50 C61 D9 M50 E61 F9 N50
+M1006 A53 B9 L50 C53 D9 M50 E53 F9 N50
+M1006 A56 B9 L50 C56 D9 M50 E56 F9 N50
+M1006 A61 B18 L50 C61 D18 M50 E61 F18 N50
+M1006 W
+;=====printer start sound ===================
 
 
   ;; probably ams related commands?

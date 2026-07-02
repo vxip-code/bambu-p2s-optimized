@@ -63,8 +63,6 @@ Secondly since the original start code is updated periodically, I want to easily
 
 - **Nozzle heating:** Add non-blocking pre-heating to 140 °C at start to speed things up.
 
-- **Remove startup sound:** This can also be disabled in the printer menu, but code was still commented out.
-
 - **Decreased Z-movement:** Default is huge (+22/-12) and has been reduced (+5/-2).
 
 - **Decreased acceleration:** Acceleration during initialization was 10.000 mm/s² which is quite abrupt and not really necessary during startup and has therefore been reduced to 5.000 mm/s². (Acceleration defined in the slicer is still used at print start.)
@@ -106,8 +104,6 @@ Secondly since the original start code is updated periodically, I want to easily
 - **Keep or unload filament:** See explanation above.
 
 - **Clean nozzle:** If filament is not unloaded, the same nozzle cleaning as in the start code is applied: A little filament is extruded, cooled down and flicked off so the nozzle stays clean for the next print.
-
-- **Remove finish sound:** This can also be disabled in the printer menu, but code was still commented out.
 
 
 ### Other changes
