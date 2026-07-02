@@ -31,13 +31,13 @@ The P2S is great but its print start and end routines are flawed.
 
 ## Disclaimer
 
-⚠️ USE AT YOUR OWN RISK!
-
-This custom G-code is provided "as-is" without any warranties of safety or compatibility. This script has been tested to work with PLA and PETG - other materials such as engineering and high-temperature filaments have NOT been tested and therefore may be cause problems.
-
-By executing this script, you accept full responsibility for any outcomes. The author assumes no liability for hardware damage (such as nozzle crashes or heater failures), financial losses, or personal injuries resulting from the use or modification of this code.
-
-Before running this script, you must manually verify that the commands match your specific printer model, firmware version, and hardware setup. Always remain by your machine's physical power switch during the initial execution to abort immediately if necessary.
+> ⚠️ USE AT YOUR OWN RISK!
+>
+> This custom G-code is provided "as-is" without any warranties of safety or compatibility. This script has been tested to work with PLA and PETG - other materials such as engineering and high-temperature filaments have NOT been tested and therefore may be cause problems.
+>
+> By executing this script, you accept full responsibility for any outcomes. The author assumes no liability for hardware damage (such as nozzle crashes or heater failures), financial losses, or personal injuries resulting from the use or modification of this code.
+>
+> Before running this script, you must manually verify that the commands match your specific printer model, firmware version, and hardware setup. Always remain by your machine's physical power switch during the initial execution to abort immediately if necessary.
 
 ## Why change anything?
 
@@ -72,8 +72,8 @@ Secondly since the original start code is updated periodically, I want to easily
 - **Enable input shaping:** Motor noise suppression was enabled before turning on input shaping, therefore having no effect and being the reason why startup sequence was louder than it needed to be. (Source: https://www.reddit.com/r/BambuLab/comments/1s8kneu/p2s_quirks_and_poorly_optimized_firmware_settings/)
 
 - **ℹ️ Nozzle wiping:**
-  - **The problem:** During/after filament purge and optional extruder calibration filament poop is ejected and nozzle is wiped multiple times. Yet with the nozzle still being hot filament continues to ooze out - sticking to the nozzle (and we can't change that since it's baked into firmware).
-  - **The fix:** A little extra filament is being pushed through the nozzle, cooling fan is activated while waiting for the nozzle to reach a lower temperature (currently 170 °C). By doing the purge flick, the cooled down filament is removed from the nozzle without oozing of more filament. Then regular nozzle scraping on the little metal plate is performed.
+  - **⭕ The problem:** During/after filament purge and optional extruder calibration filament poop is ejected and nozzle is wiped multiple times. Yet with the nozzle still being hot filament continues to ooze out - sticking to the nozzle (and we can't change that since it's baked into firmware).
+  - **✅ The fix:** A little extra filament is being pushed through the nozzle, cooling fan is activated while waiting for the nozzle to reach a lower temperature (currently 170 °C). By doing the purge flick, the cooled down filament is removed from the nozzle without oozing of more filament. Then regular nozzle scraping on the little metal plate is performed.
 
 - **Disabled vibration calibration:** Full vibration compensation can and should be performed from the menu every time the printer is moved to a different location (and after firmware updates or maintenance). The very short but loud burst of what is called 'mech mode sweep' in the official G-code imho serves no purpose and is therefore removed.
 
@@ -92,9 +92,7 @@ Secondly since the original start code is updated periodically, I want to easily
 
 > **ℹ️ Filament is NOT UNLOADED after printing.**
 >
-> The default behaviour of any Bambu Lab printer is that after printing the filament is unloaded (when using an AMS).
->
-> However often times we want to continue printing using the same filament. Therefore with the custom end G-code this behaviour is changed and the filament **intentionally** is not unloaded - which speeds up consecutive prints (and is less noisy).
+> The default behaviour of any Bambu Lab printer is that after printing the filament is unloaded (when using an AMS). However often times we want to continue printing using the same filament. Therefore with the custom end G-code this behaviour is changed and the filament **intentionally** is not unloaded - which speeds up consecutive prints (and is less noisy).
 >
 > If you want to use a different filament next that's fine! The printer will automatically change the filament at the start of the print.
 >
@@ -121,7 +119,7 @@ Secondly since the original start code is updated periodically, I want to easily
 
 ## How to install
 
-> **Hint:** You can switch between the default and optimized printer profile any time you like.
+> **ℹ️ Hint:** You can switch between the default and optimized printer profile any time you like.
 
 
 ### Step 1
@@ -195,6 +193,6 @@ The folder `original` contains current versions of the official G-codes by Bambu
 
 I initially created this G-code for myself so that I can fully enjoy the printer and get rid of the annoying quirks that otherwise taint the experience for me. I use it every single print.
 
-> **Hint:** If you want your P2S to be more quiet, I also recommend reducing all accelerations from 10000 mm/s² to 6000 mm/s² in the slicer. This adds very little extra time to your prints but makes the printer operate much more quiet and stops it shaking violently.
+> **ℹ️ Hint:** If you want your P2S to be more quiet, I also recommend reducing all accelerations of 10000 mm/s² to 6000 mm/s² in the slicer. This adds very little extra time to your prints but makes the printer operate much more quiet and stops it shaking violently.
 
 **If you have any questions or encounter problems don't hesitate to reach out!**
